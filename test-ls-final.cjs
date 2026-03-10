@@ -76,6 +76,7 @@ _lm(['animo','animum','animi','animorum','animis','animos'], 'animus')
 _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'amo')
 _lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
 _lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
+_lm(['caeli','caelo','caelorum','caelis','coelum','coeli','coelo','coelorum','coelis'], 'caelum')
 
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
 const FREQ_ORDER = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, X: 6 }
@@ -243,6 +244,34 @@ function lookupLS(raw) {
   const alt = word.replace(/j/g, 'i').replace(/v/g, 'u')
   if (alt !== word) searchStems(alt)
 
+  // Renaissance/medieval orthographic variants
+  const hiVariants = new Set()
+  const loVariants = new Set()
+  if (word.includes('oe')) {
+    hiVariants.add(word.replace(/oe/g, 'ae'))
+    loVariants.add(word.replace(/oe/g, 'e'))
+  }
+  if (word.includes('ae')) {
+    hiVariants.add(word.replace(/ae/g, 'oe'))
+    loVariants.add(word.replace(/ae/g, 'e'))
+  }
+  if (word.includes('y')) loVariants.add(word.replace(/y/g, 'i'))
+  if (word.includes('ph')) loVariants.add(word.replace(/ph/g, 'f'))
+  for (const v of hiVariants) {
+    if (v !== word) {
+      if (LS_LEMMA[v]) add(LS_LEMMA[v], 14)
+      add(v, 14)
+      searchStems(v)
+    }
+  }
+  for (const v of loVariants) {
+    if (v !== word) {
+      if (LS_LEMMA[v]) add(LS_LEMMA[v], 13)
+      add(v, 8)
+      searchStems(v)
+    }
+  }
+
   // 4. Also try raw DICT stems + LEMMA_ENDINGS as broad net
   const triedStems = new Set()
   for (let cut = 0; cut <= Math.min(7, word.length - 2); cut++) {
@@ -379,6 +408,10 @@ const tests = [
   ['amans', 'amo'], ['docens', 'doceo'],
   // Superlatives/comparatives
   ['optimus', 'optimus'], ['maximus', 'maximus'],
+  // Renaissance orthographic variants (oe→e, y→i, etc.)
+  ['foeminae', 'femina'], ['foemina', 'femina'], ['foeminarum', 'femina'],
+  ['coelum', 'caelum'], ['coelo', 'caelum'], ['coeli', 'caelum'],
+  ['sylva', 'sylva'], ['sylvas', 'silva'],  // sylva is its own L&S headword
 ]
 
 let pass = 0, fail = 0

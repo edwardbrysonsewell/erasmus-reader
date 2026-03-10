@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import colloquia from './data/colloquia.json'
-import { lookupWord, lookupLS } from './lookup'
+import { lookupLS } from './lookup'
 
 const BOOKMARK_KEY = 'erasmus-bookmark'
 const SCROLL_KEY = 'erasmus-scroll-'
@@ -13,7 +13,6 @@ function loadBookmark() {
 export default function App() {
   const [selected, setSelected] = useState(null)
   const [popup, setPopup] = useState(null)
-  const [showLS, setShowLS] = useState(false)
   const [search, setSearch] = useState('')
   const [fontSize, setFontSize] = useState(() =>
     parseInt(localStorage.getItem(FONT_KEY)) || 20
@@ -54,14 +53,11 @@ export default function App() {
     e.stopPropagation()
     const clean = word.replace(/[.,;:!?"""''()[\]{}<>«»—–\-\/\\0-9]/g, '')
     if (!clean) return
-    const result = lookupWord(clean)
     const ls = lookupLS(clean)
     const rect = e.currentTarget.getBoundingClientRect()
     const cr = containerRef.current?.getBoundingClientRect() || { left: 0, top: 0 }
-    setShowLS(false)
     setPopup({
       clean,
-      result,
       ls,
       x: rect.left - cr.left + rect.width / 2,
       y: rect.bottom - cr.top + 8,
@@ -71,10 +67,8 @@ export default function App() {
   function handleLSWordTap(word) {
     const clean = word.replace(/[.,;:!?"""''()[\]{}<>«»—–\-\/\\0-9]/g, '')
     if (!clean) return
-    const result = lookupWord(clean)
     const ls = lookupLS(clean)
-    setPopup(prev => prev ? { ...prev, clean, result, ls } : prev)
-    setShowLS(true)
+    setPopup(prev => prev ? { ...prev, clean, ls } : prev)
   }
 
   function saveBookmark() {
@@ -126,7 +120,7 @@ export default function App() {
         </div>
         <footer className="toc-footer">
           <p>66 colloquia &middot; {colloquia.reduce((s, c) => s + c.wordCount, 0).toLocaleString()} words</p>
-          <p className="credit">Text: Wikisource (Holtze 1892) &middot; Dictionary: Whitaker's Words</p>
+          <p className="credit">Text: Wikisource (Holtze 1892) &middot; Dictionary: Lewis &amp; Short</p>
         </footer>
       </div>
     )
@@ -150,25 +144,14 @@ export default function App() {
         <TextBody text={selected.text} fontSize={fontSize} onWordTap={handleWordTap} />
 
         {popup && (
-          <div ref={popupRef} className={`popup ${showLS ? 'popup-expanded' : ''}`}
+          <div ref={popupRef} className="popup popup-expanded"
             onClick={e => e.stopPropagation()} style={{
-            left: showLS ? '8px' : `${Math.min(Math.max(popup.x - 140, 8), (containerRef.current?.clientWidth || 300) - 296)}px`,
+            left: '8px',
             top: `${popup.y}px`,
-            width: showLS ? 'calc(100% - 16px)' : undefined,
+            width: 'calc(100% - 16px)',
           }}>
             <div className="popup-word">{popup.clean}</div>
-            {popup.result ? popup.result.allDefs.map((d, i) => (
-              <div key={i} className="popup-def">
-                <span className="popup-pos">{d.pos}</span> {d.def}
-              </div>
-            )) : <div className="popup-def"><em>No entry found</em></div>}
-
-            {popup.ls && (
-              <button className="ls-toggle" onClick={() => setShowLS(v => !v)}>
-                {showLS ? 'Hide' : 'Show'} Lewis &amp; Short
-              </button>
-            )}
-            {showLS && popup.ls && popup.ls.map((entry, i) => (
+            {popup.ls ? popup.ls.slice(0, 3).map((entry, i) => (
               <div key={i} className="ls-entry">
                 <div className="ls-head">
                   <span className="ls-orth">{entry.o}</span>
@@ -177,7 +160,7 @@ export default function App() {
                 {entry.n && <div className="ls-notes"><ClickableText text={entry.n} onWordTap={handleLSWordTap} /></div>}
                 <div className="ls-senses"><ClickableText text={entry.s} onWordTap={handleLSWordTap} /></div>
               </div>
-            ))}
+            )) : <div className="popup-def"><em>No entry found</em></div>}
           </div>
         )}
       </div>

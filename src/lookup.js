@@ -88,6 +88,7 @@ _lm(['animo','animum','animi','animorum','animis','animos'], 'animus')
 _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'amo')
 _lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
 _lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
+_lm(['caeli','caelo','caelorum','caelis','coelum','coeli','coelo','coelorum','coelis'], 'caelum')
 
 // Common endings to try when reconstructing lemmas
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
@@ -253,6 +254,35 @@ export function lookupLS(raw) {
   // Also try j→i, v→u normalization
   const alt = word.replace(/j/g, 'i').replace(/v/g, 'u')
   if (alt !== word) searchStems(alt)
+
+  // Renaissance/medieval orthographic variants (Erasmus uses oe for ae or e, etc.)
+  // Priority: oe↔ae (standard normalization, high score) > oe/ae→e, y→i (lower score)
+  const hiVariants = new Set()  // high-confidence variants
+  const loVariants = new Set()  // lower-confidence variants
+  if (word.includes('oe')) {
+    hiVariants.add(word.replace(/oe/g, 'ae'))  // coelum → caelum (standard)
+    loVariants.add(word.replace(/oe/g, 'e'))   // foemina → femina
+  }
+  if (word.includes('ae')) {
+    hiVariants.add(word.replace(/ae/g, 'oe'))  // reverse
+    loVariants.add(word.replace(/ae/g, 'e'))   // rare
+  }
+  if (word.includes('y')) loVariants.add(word.replace(/y/g, 'i'))   // sylva → silva
+  if (word.includes('ph')) loVariants.add(word.replace(/ph/g, 'f')) // rare
+  for (const v of hiVariants) {
+    if (v !== word) {
+      if (LS_LEMMA[v]) add(LS_LEMMA[v], 14)
+      add(v, 14)
+      searchStems(v)
+    }
+  }
+  for (const v of loVariants) {
+    if (v !== word) {
+      if (LS_LEMMA[v]) add(LS_LEMMA[v], 13)
+      add(v, 8)
+      searchStems(v)
+    }
+  }
 
   // 4. Also try raw DICT stems + LEMMA_ENDINGS as broad net
   const triedStems = new Set()
