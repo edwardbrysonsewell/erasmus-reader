@@ -86,6 +86,8 @@ _lm(['maximum','maxima','maximi','maximo','maximorum','maximis','maximos'], 'max
 _lm(['pedis','pedi','pedem','pede','pedes','pedum','pedibus'], 'pes')
 _lm(['animo','animum','animi','animorum','animis','animos'], 'animus')
 _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'amo')
+_lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
+_lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
 
 // Common endings to try when reconstructing lemmas
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']

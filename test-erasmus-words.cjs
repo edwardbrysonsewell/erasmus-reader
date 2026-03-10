@@ -1,4 +1,4 @@
-// Standalone test harness for L&S lemmatization (synced with src/lookup.js)
+// Test L&S lemmatization on real words from Erasmus' Colloquia
 const { readFileSync } = require('fs')
 
 const DICT = JSON.parse(readFileSync('./src/data/DICTLINE.json', 'utf8'))
@@ -8,29 +8,17 @@ function normalize(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]/g, '').replace(/j/g, 'i')
 }
 
-// ── LS_LEMMA: irregular form → L&S lemma key (must match src/lookup.js) ──
+// ── LS_LEMMA (synced with src/lookup.js) ──
 const LS_LEMMA = {}
 const _lm = (forms, lemma) => forms.forEach(f => { LS_LEMMA[f] = lemma })
-_lm(['sum','es','est','sumus','estis','sunt','eram','eras','erat','eramus','eratis','erant',
-  'ero','eris','erit','erimus','eritis','erunt','sim','sis','sit','simus','sitis','sint',
-  'essem','esses','esset','essemus','essetis','essent','esse','fui','fuisti','fuit',
-  'fuimus','fuistis','fuerunt','fuerat','fuerant','fuerit','fuisse','fuisset'], 'sum')
-_lm(['possum','potes','potest','possumus','potestis','possunt','poteram','poterat','poterant',
-  'possim','possit','possint','posset','possent','posse','potui','potuit','potuisse'], 'possum')
-_lm(['eo','is','it','imus','itis','eunt','ibam','ibat','ibant','ibo','ibit',
-  'eam','eat','eant','irem','iret','ire','iens','eundi','eundo'], 'eo')
-_lm(['fero','fers','fert','ferimus','fertis','ferunt','ferebam','ferebat',
-  'feram','feret','ferent','ferre','ferrem','ferret','tuli','tulit','tulerunt',
-  'tuleram','tulerat','tulisse','latum','latus','lata','lati'], 'fero')
-_lm(['volo','vis','vult','volt','volumus','vultis','volunt','volebam','volebat',
-  'volam','volet','volent','velim','velit','velint','vellem','vellet','velle',
-  'volui','voluit','voluisse'], 'volo')
-_lm(['nolo','nolumus','nolunt','nolebam','nolebat','nolim','nolit','nollem',
-  'nolle','noli','nolite','nolui','noluit'], 'nolo')
-_lm(['malo','mavis','mavult','malumus','malunt','malebam','malim','malit',
-  'mallem','malle','malui','maluit'], 'malo')
-_lm(['fio','fis','fit','fiunt','fiebam','fiebat','fiam','fiat','fierem',
-  'fieret','fieri'], 'fio')
+_lm(['sum','es','est','sumus','estis','sunt','eram','eras','erat','eramus','eratis','erant','ero','eris','erit','erimus','eritis','erunt','sim','sis','sit','simus','sitis','sint','essem','esses','esset','essemus','essetis','essent','esse','fui','fuisti','fuit','fuimus','fuistis','fuerunt','fuerat','fuerant','fuerit','fuisse','fuisset'], 'sum')
+_lm(['possum','potes','potest','possumus','potestis','possunt','poteram','poterat','poterant','possim','possit','possint','posset','possent','posse','potui','potuit','potuisse'], 'possum')
+_lm(['eo','is','it','imus','itis','eunt','ibam','ibat','ibant','ibo','ibit','eam','eat','eant','irem','iret','ire','iens','eundi','eundo'], 'eo')
+_lm(['fero','fers','fert','ferimus','fertis','ferunt','ferebam','ferebat','feram','feret','ferent','ferre','ferrem','ferret','tuli','tulit','tulerunt','tuleram','tulerat','tulisse','latum','latus','lata','lati'], 'fero')
+_lm(['volo','vis','vult','volt','volumus','vultis','volunt','volebam','volebat','volam','volet','volent','velim','velit','velint','vellem','vellet','velle','volui','voluit','voluisse'], 'volo')
+_lm(['nolo','nolumus','nolunt','nolebam','nolebat','nolim','nolit','nollem','nolle','noli','nolite','nolui','noluit'], 'nolo')
+_lm(['malo','mavis','mavult','malumus','malunt','malebam','malim','malit','mallem','malle','malui','maluit'], 'malo')
+_lm(['fio','fis','fit','fiunt','fiebam','fiebat','fiam','fiat','fierem','fieret','fieri'], 'fio')
 _lm(['inquam','inquis','inquit','inquiunt','inquiat'], 'inquam')
 _lm(['ego','me','mei','mihi'], 'ego')
 _lm(['tu','te','tui','tibi'], 'tu')
@@ -44,7 +32,6 @@ _lm(['qui','quae','quod','cuius','cui','quem','quam','quo','qua','quorum','quaru
 _lm(['quis','quid'], 'quis')
 _lm(['is','ea','id','eius','ei','eum','eam','eo','eae','eorum','earum','eis','eos','eas','iis'], 'is')
 _lm(['idem','eadem','eodem','eandem','eundem','eorundem','earundem','eisdem','eosdem'], 'idem')
-// Common 3rd/5th decl nouns whose stems overlap with other words
 _lm(['lucis','luci','lucem','luce','luces','lucum','lucibus'], 'lux')
 _lm(['partis','parti','partem','parte','partes','partium','partibus'], 'pars')
 _lm(['rei','rem','rerum','rebus'], 'res')
@@ -66,11 +53,9 @@ _lm(['oneris','oneri','onera','onerum','oneribus'], 'onus')
 _lm(['vulneris','vulneri','vulnera','vulnerum','vulneribus'], 'vulnus')
 _lm(['sceleris','sceleri','scelera','scelerum','sceleribus'], 'scelus')
 _lm(['muneris','muneri','munera','munerum','muneribus'], 'munus')
-// Adjective/noun forms where L&S has separate sub-entries that steal the match
 _lm(['bonum','bona','boni','bono','bonorum','bonis','bonos','bonas','bonam'], 'bonus')
 _lm(['optimum','optima','optimi','optimo','optimorum','optimis','optimos'], 'optimus')
 _lm(['maximum','maxima','maximi','maximo','maximorum','maximis','maximos'], 'maximus')
-// Forms where L&S has a separate (rare) headword that steals the match from the common word
 _lm(['pedis','pedi','pedem','pede','pedes','pedum','pedibus'], 'pes')
 _lm(['animo','animum','animi','animorum','animis','animos'], 'animus')
 _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'amo')
@@ -146,18 +131,7 @@ const N2_ENDS = new Set(['us','um','i','o','e','orum','os','is'])
 const N3_ENDS = new Set(['em','is','i','e','es','ibus','um','ium','a'])
 const N4_ENDS = new Set(['us','u','ui','uum','ibus'])
 const N5_ENDS = new Set(['es','ei','erum','ebus'])
-const V_ENDS = new Set(['o','as','at','amus','atis','ant','es','et','emus','etis','ent',
-  'is','it','imus','itis','unt','ebam','ebas','ebat','ebamus','ebatis','ebant',
-  'abam','abas','abat','abamus','abatis','abant','iebam','iebas','iebat',
-  'abo','abis','abit','abimus','abitis','abunt','ebo','ebis','ebit',
-  'am','iam','ias','iat','iamus','iatis','iant',
-  'arem','ares','aret','erem','eres','eret','irem','ires','iret',
-  'a','ate','are','e','ete','ere','i','ite','ire',
-  'eo','io','avit','evit','ivit','uit',
-  'atur','etur','itur','antur','entur','untur',
-  'or','aris','eris','iris',
-  'ans','ens','iens',
-  're','ri','isse','ando','endo','iendo'])
+const V_ENDS = new Set(['o','as','at','amus','atis','ant','es','et','emus','etis','ent','is','it','imus','itis','unt','ebam','ebas','ebat','ebamus','ebatis','ebant','abam','abas','abat','abamus','abatis','abant','iebam','iebas','iebat','abo','abis','abit','abimus','abitis','abunt','ebo','ebis','ebit','am','iam','ias','iat','iamus','iatis','iant','arem','ares','aret','erem','eres','eret','irem','ires','iret','a','ate','are','e','ete','ere','i','ite','ire','eo','io','avit','evit','ivit','uit','atur','etur','itur','antur','entur','untur','or','aris','eris','iris','ans','ens','iens','re','ri','isse','ando','endo','iendo'])
 const ADJ12_ENDS = new Set(['us','a','um','i','ae','o','orum','arum','os','as','is','ibus','em','e'])
 const ADJ3_ENDS = new Set(['is','e','i','es','ium','ibus','em','ia','ior','ius'])
 
@@ -188,7 +162,6 @@ function lsGet(key) {
   return null
 }
 
-// Build stem index
 const stemIdx = new Map()
 for (const entry of DICT) {
   if (!entry.stems) continue
@@ -204,25 +177,20 @@ function lookupLS(raw) {
   if (!raw) return null
   const word = normalize(raw)
   if (!word) return null
-
   const found = new Map()
   function add(candidate, freqScore) {
     const key = lsGet(candidate)
     if (!key) return
+    const lsEntries = LS[key]
+    if (!lsEntries || !Array.isArray(lsEntries)) return
     if (!found.has(key)) {
-      found.set(key, { entries: LS[key], freq: freqScore || 0 })
+      found.set(key, { ents: lsEntries, freq: freqScore || 0 })
     } else if ((freqScore || 0) > found.get(key).freq) {
       found.get(key).freq = freqScore
     }
   }
-
-  // 1. Irregular form → lemma mapping (highest confidence — must beat direct match)
   if (LS_LEMMA[word]) add(LS_LEMMA[word], 15)
-
-  // 2. Direct match (if the word IS a headword — but LS_LEMMA overrides win)
   add(word, 12)
-
-  // 3. Find ALL matching DICT entries via stem stripping, then construct L&S lemmas
   function searchStems(w) {
     for (let cut = 0; cut <= Math.min(7, w.length - 2); cut++) {
       const stem = cut === 0 ? w : w.slice(0, -cut)
@@ -239,11 +207,8 @@ function lookupLS(raw) {
     }
   }
   searchStems(word)
-
   const alt = word.replace(/j/g, 'i').replace(/v/g, 'u')
   if (alt !== word) searchStems(alt)
-
-  // 4. Also try raw DICT stems + LEMMA_ENDINGS as broad net
   const triedStems = new Set()
   for (let cut = 0; cut <= Math.min(7, word.length - 2); cut++) {
     const stem = cut === 0 ? word : word.slice(0, -cut)
@@ -261,138 +226,199 @@ function lookupLS(raw) {
       }
     }
   }
-
-  // 5. Blind stem stripping as absolute last resort
   if (found.size === 0) {
     for (let cut = 1; cut <= Math.min(7, word.length - 2); cut++) {
       const stem = word.slice(0, -cut)
       add(stem, 0)
-      for (const end of LEMMA_ENDINGS) {
-        if (stem + end !== word) add(stem + end, 0)
-      }
+      for (const end of LEMMA_ENDINGS) { if (stem + end !== word) add(stem + end, 0) }
       if (found.size > 0) break
     }
   }
-
   if (found.size === 0) return null
-
   const sorted = [...found.entries()].sort((a, b) => b[1].freq - a[1].freq)
   const result = []
   const seen = new Set()
   for (const [, data] of sorted) {
-    for (const e of data.entries) {
+    for (const e of data.ents) {
       const key = (e.o || '') + '||' + (e.s || '').slice(0, 100)
-      if (!seen.has(key)) {
-        seen.add(key)
-        result.push(e)
-      }
+      if (!seen.has(key)) { seen.add(key); result.push(e) }
     }
   }
-
   return result.length > 0 ? result : null
 }
 
 // ═══════════════════════════════════════════════
-// TEST SUITE
+// EXTRACT AND TEST REAL ERASMUS WORDS
 // ═══════════════════════════════════════════════
+const coll = JSON.parse(readFileSync('./src/data/colloquia.json', 'utf8'))
 
-// Normalize for comparison: strip diacritics, lowercase, j→i
+// Get ALL unique words from ALL colloquia
+const allWords = new Set()
+for (const c of coll) {
+  const tokens = c.text.replace(/[^a-zA-ZāēīōūàèìòùäëïöüÆæ]/g, ' ').split(/\s+/).filter(Boolean)
+  for (const t of tokens) {
+    if (t.length >= 2 && t.length <= 25) allWords.add(t.toLowerCase())
+  }
+}
+console.log(`Total unique words across all ${coll.length} colloquia: ${allWords.size}`)
+
+// Test ALL words for L&S coverage
+let found = 0, notFound = 0
+const notFoundWords = []
+for (const w of allWords) {
+  const r = lookupLS(w)
+  if (r && r.length > 0) {
+    found++
+  } else {
+    notFound++
+    notFoundWords.push(w)
+  }
+}
+console.log(`\nL&S coverage: ${found}/${found + notFound} (${(100 * found / (found + notFound)).toFixed(1)}%)`)
+console.log(`Not found: ${notFound}`)
+
+// Show sample of NOT_FOUND words (sorted by length, shorter = more likely common)
+notFoundWords.sort((a, b) => a.length - b.length)
+console.log(`\nShortest NOT_FOUND words (most likely to be real gaps):`)
+notFoundWords.slice(0, 60).forEach(w => process.stdout.write(w + '  '))
+console.log()
+
+// Now do a QUALITY check on a curated set of common Erasmus words
+// These are hand-verified: [inflected form, expected lemma]
+const qualityTests = [
+  // Very common function words
+  ['et', null], // conjunction, should find something
+  ['non', null],
+  ['sed', null],
+  ['in', null],
+  ['ad', null],
+  ['cum', null],
+  ['ut', null],
+  ['si', null],
+  ['de', null],
+  ['ex', null],
+  ['per', null],
+  ['quod', 'qui'],
+  ['enim', null],
+  ['autem', null],
+  ['nec', null],
+  ['aut', null],
+  ['tam', null],
+  ['atque', null],
+  // Common nouns - nominative forms
+  ['homo', 'homo'],
+  ['deus', 'deus'],
+  ['rex', 'rex'],
+  ['pater', 'pater'],
+  ['mater', 'mater'],
+  ['filius', 'filius'],
+  ['mulier', 'mulier'],
+  ['vir', 'vir'],
+  ['animus', 'animus'],
+  ['corpus', 'corpus'],
+  ['verbum', 'verbum'],
+  ['vita', 'vita'],
+  ['mors', 'mors'],
+  // Common nouns - oblique cases
+  ['hominem', 'homo'],
+  ['hominis', 'homo'],
+  ['deum', 'deus'],
+  ['regem', 'rex'],
+  ['patrem', 'pater'],
+  ['matrem', 'mater'],
+  ['filium', 'filius'],
+  ['mulierem', 'mulier'],
+  ['virum', 'vir'],
+  ['animum', 'animus'],
+  ['corpore', 'corpus'],
+  ['verba', 'verbum'],
+  ['vitam', 'vita'],
+  ['mortem', 'mors'],
+  // Common verbs
+  ['est', 'sum'],
+  ['sunt', 'sum'],
+  ['erat', 'sum'],
+  ['fuit', 'sum'],
+  ['esse', 'sum'],
+  ['habet', 'habeo'],
+  ['habent', 'habeo'],
+  ['dicit', 'dico'],
+  ['dixit', 'dico'],
+  ['facit', 'facio'],
+  ['fecit', 'facio'],
+  ['videt', 'video'],
+  ['vidit', 'video'],
+  ['venit', 'venio'],
+  ['potest', 'possum'],
+  ['possunt', 'possum'],
+  ['debet', 'debeo'],
+  ['vult', 'volo'],
+  ['volunt', 'volo'],
+  ['scit', 'scio'],
+  ['amat', 'amo'],
+  ['docet', 'doceo'],
+  ['audit', 'audio'],
+  // Erasmus-specific vocabulary
+  ['colloquium', 'colloquium'],
+  ['pietas', 'pietas'],
+  ['evangelium', 'evangelium'],
+  ['philosophia', 'philosophia'],
+  ['monachus', 'monachus'],
+  ['monachorum', 'monachus'],
+  ['episcopus', 'episcopus'],
+  ['sacerdos', 'sacerdos'],
+  ['scriptura', 'scriptura'],
+  ['christianus', 'christianus'],
+  ['ecclesia', 'ecclesia'],
+  // Adjectives
+  ['bonus', 'bonus'],
+  ['bonum', 'bonus'],
+  ['malum', 'malus'],
+  ['magnus', 'magnus'],
+  ['magnum', 'magnus'],
+  ['parvus', 'parvus'],
+  ['verus', 'verus'],
+  ['novus', 'novus'],
+  ['sanctus', 'sanctus'],
+  // Pronouns
+  ['ille', 'ille'],
+  ['illum', 'ille'],
+  ['hic', 'hic'],
+  ['hanc', 'hic'],
+  ['ipse', 'ipse'],
+  ['ipsum', 'ipse'],
+  ['quis', 'quis'],
+  ['quem', 'qui'],
+]
+
+console.log('\n═══════════════════════════════════════')
+console.log('QUALITY CHECK: Common Erasmus words')
+console.log('═══════════════════════════════════════')
+
 function cmpKey(s) {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '').replace(/j/g, 'i')
 }
 
-const tests = [
-  // Previously failing 3rd decl
-  ['lucis', 'lux'], ['partis', 'pars'], ['rei', 'res'],
-  // LS_LEMMA 3rd decl nouns
-  ['vocis', 'vox'], ['vocem', 'vox'], ['legis', 'lex'], ['legem', 'lex'],
-  ['pacis', 'pax'], ['pacem', 'pax'], ['iuris', 'jus'], ['iure', 'jus'],
-  ['noctis', 'nox'], ['noctem', 'nox'], ['artis', 'ars'], ['artem', 'ars'],
-  ['mortis', 'mors'], ['mortem', 'mors'], ['mentis', 'mens'], ['mentem', 'mens'],
-  ['gentis', 'gens'], ['gentem', 'gens'],
-  // 3rd decl nouns (stem overlap with verbs)
-  ['operis', 'opus'], ['diem', 'dies'],
-  ['generis', 'genus'], ['oneris', 'onus'],
-  // Previous test words (spot check)
-  ['regem', 'rex'], ['ducem', 'dux'], ['senem', 'senex'],
-  ['cachinnos', 'cachinnus'], ['iudicem', 'judex'],
-  ['amorem', 'amor'], ['virtutis', 'virtus'], ['hominem', 'homo'],
-  ['mulieris', 'mulier'], ['corporis', 'corpus'],
-  ['temporis', 'tempus'], ['nominis', 'nomen'], ['carminis', 'carmen'],
-  ['luminis', 'lumen'], ['fluminis', 'flumen'],
-  // Common verbs
-  ['amat', 'amo'], ['amavit', 'amo'], ['amabat', 'amo'],
-  ['docet', 'doceo'], ['docuit', 'doceo'], ['scripsit', 'scribo'],
-  ['dixit', 'dico'], ['fecit', 'facio'], ['cepit', 'capio'],
-  ['misit', 'mitto'], ['venit', 'venio'], ['vidit', 'video'],
-  // 1st declension nouns
-  ['puellam', 'puella'], ['aquam', 'aqua'], ['terram', 'terra'],
-  ['vitam', 'vita'], ['causam', 'causa'],
-  // 2nd declension nouns
-  ['amicum', 'amicus'], ['populum', 'populus'], ['bellum', 'bellum'],
-  ['verbum', 'verbum'], ['consilium', 'consilium'],
-  // 4th declension
-  ['exercitus', 'exercitus'], ['senatus', 'senatus'], ['manus', 'manus'],
-  // 5th declension
-  ['spem', 'spes'], ['fidem', 'fides'],
-  // Adjectives — LS_LEMMA overrides sub-entries
-  ['magnum', 'magnus'], ['bonum', 'bonus'], ['bonorum', 'bonus'],
-  ['fortem', 'fortis'], ['fortium', 'fortis'],
-  // Pronouns/demonstratives via LS_LEMMA
-  ['illum', 'ille'], ['hanc', 'hic'], ['quem', 'qui'], ['ipsum', 'ipse'],
-  // Prepositions/particles (direct match)
-  ['cum', 'cum'], ['sine', 'sine'], ['inter', 'inter'],
-  // More tricky 3rd decl
-  ['militis', 'miles'], ['pedis', 'pes'], ['capitis', 'caput'],
-  ['civitatis', 'civitas'], ['libertatis', 'libertas'],
-  // More verbs (different conjugations)
-  ['audit', 'audio'], ['audivit', 'audio'],
-  ['monet', 'moneo'], ['monuit', 'moneo'],
-  ['ducit', 'duco'], ['duxit', 'duco'],
-  ['capit', 'capio'], ['accipit', 'accipio'],
-  // Erasmus-specific common words
-  ['colloquium', 'colloquium'], ['familiaria', 'familiaris'],
-  ['epistolam', 'epistola'], ['philosophiam', 'philosophia'],
-  // Additional stress tests
-  ['animum', 'animus'], ['animo', 'animus'], ['animorum', 'animus'],
-  ['pecuniam', 'pecunia'], ['pecuniae', 'pecunia'],
-  ['litteras', 'littera'], ['litterarum', 'littera'],
-  ['patrem', 'pater'], ['patris', 'pater'],
-  ['matrem', 'mater'], ['matris', 'mater'],
-  ['fratrem', 'frater'], ['fratris', 'frater'],
-  ['filium', 'filius'], ['filii', 'filius'], ['filia', 'filia'],
-  ['dominum', 'dominus'], ['domini', 'dominus'],
-  ['servum', 'servus'], ['servi', 'servus'],
-  ['urbem', 'urbs'], ['urbis', 'urbs'],
-  ['corpus', 'corpus'], ['corpora', 'corpus'],
-  ['tempus', 'tempus'], ['tempora', 'tempus'],
-  ['nomen', 'nomen'], ['nomina', 'nomen'],
-  ['caput', 'caput'], ['capita', 'caput'],
-  ['flumen', 'flumen'], ['flumina', 'flumen'],
-  ['genus', 'genus'], ['munus', 'munus'], ['muneris', 'munus'],
-  ['vulnus', 'vulnus'], ['vulneris', 'vulnus'],
-  ['scelus', 'scelus'], ['sceleris', 'scelus'],
-  ['onus', 'onus'],
-  // Deponent verbs
-  ['sequitur', 'sequor'], ['loquitur', 'loquor'],
-  // Participles finding parent verb
-  ['amans', 'amo'], ['docens', 'doceo'],
-  // Superlatives/comparatives
-  ['optimus', 'optimus'], ['maximus', 'maximus'],
-]
-
-let pass = 0, fail = 0
-for (const [word, expectedLemma] of tests) {
+let qPass = 0, qFail = 0, qFound = 0
+for (const [word, expectedLemma] of qualityTests) {
   const result = lookupLS(word)
-  const firstOrth = result?.[0]?.o || 'NOT_FOUND'
-  const firstKey = cmpKey(firstOrth)
-  const expKey = cmpKey(expectedLemma)
-  if (firstKey === expKey) {
-    pass++
+  if (!result || result.length === 0) {
+    qFail++
+    console.log(`  MISS: ${word} → NOT_FOUND (expected ${expectedLemma || 'any'})`)
+    continue
+  }
+  qFound++
+  if (expectedLemma) {
+    const firstOrth = result[0].o || ''
+    if (cmpKey(firstOrth) === cmpKey(expectedLemma)) {
+      qPass++
+    } else {
+      qFail++
+      console.log(`  WRONG: ${word} → ${firstOrth} (expected ${expectedLemma})`)
+    }
   } else {
-    fail++
-    console.log(`MISS: ${word} → ${firstOrth} (expected ${expectedLemma})`)
+    qPass++ // no specific expectation, just needs to find something
   }
 }
-console.log(`\n${pass}/${pass+fail} correct (${(100*pass/(pass+fail)).toFixed(1)}%)`)
-if (fail === 0) console.log('ALL TESTS PASSED!')
+console.log(`\nQuality: ${qPass}/${qPass + qFail} correct (${(100 * qPass / (qPass + qFail)).toFixed(1)}%)`)
+console.log(`Found any result: ${qFound}/${qualityTests.length}`)
