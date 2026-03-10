@@ -77,6 +77,15 @@ _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'am
 _lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
 _lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
 _lm(['caeli','caelo','caelorum','caelis','coelum','coeli','coelo','coelorum','coelis'], 'caelum')
+_lm(['concio','concionis','concioni','concionem','concione','conciones','concionum','concionibus'], 'contio')
+_lm(['concionator','concionatoris','concionatorem','concionatores'], 'contio')
+_lm(['sibi','se','sese'], 'sui')
+_lm(['suam','suas','suos','suum','suae','sui','suo','suis','sua','suorum','suarum'], 'suus')
+_lm(['tuam','tuas','tuos','tuum','tuae','tui','tuo','tuis','tua','tuorum','tuarum'], 'tuus')
+_lm(['meam','meas','meos','meum','meae','mei','meo','meis','mea','meorum','mearum'], 'meus')
+_lm(['literis','literae','literas','litera','literarum','literam'], 'littera')
+_lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','novarum'], 'novus')
+_lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
 
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
 const FREQ_ORDER = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, X: 6 }
@@ -217,11 +226,19 @@ function lookupLS(raw) {
     }
   }
 
+  // 0. Strip enclitics
+  let base = word
+  for (const enc of ['que', 'ne', 've']) {
+    if (word.endsWith(enc) && word.length > enc.length + 1) { base = word.slice(0, -enc.length); break }
+  }
+
   // 1. Irregular form → lemma mapping (highest confidence — must beat direct match)
   if (LS_LEMMA[word]) add(LS_LEMMA[word], 15)
+  if (base !== word && LS_LEMMA[base]) add(LS_LEMMA[base], 15)
 
   // 2. Direct match (if the word IS a headword — but LS_LEMMA overrides win)
   add(word, 12)
+  if (base !== word) add(base, 12)
 
   // 3. Find ALL matching DICT entries via stem stripping, then construct L&S lemmas
   function searchStems(w) {
@@ -240,6 +257,7 @@ function lookupLS(raw) {
     }
   }
   searchStems(word)
+  if (base !== word) searchStems(base)
 
   const alt = word.replace(/j/g, 'i').replace(/v/g, 'u')
   if (alt !== word) searchStems(alt)
@@ -412,6 +430,18 @@ const tests = [
   ['foeminae', 'femina'], ['foemina', 'femina'], ['foeminarum', 'femina'],
   ['coelum', 'caelum'], ['coelo', 'caelum'], ['coeli', 'caelum'],
   ['sylva', 'sylva'], ['sylvas', 'silva'],  // sylva is its own L&S headword
+  // Possessive/reflexive pronouns
+  ['sibi', 'sui'], ['suam', 'suus'], ['tuam', 'tuus'], ['meam', 'meus'],
+  // Renaissance litera = littera
+  ['literis', 'littera'], ['literae', 'littera'], ['literas', 'littera'],
+  // Adjective forms stealing by wrong verb
+  ['nova', 'novus'], ['novum', 'novus'],
+  // concio = contio
+  ['concionibus', 'contio'], ['concionem', 'contio'],
+  // Enclitics
+  ['idque', 'is'], ['haecque', 'hic'], ['animumque', 'animus'],
+  // pactum not pango
+  ['pacto', 'pactum'],
 ]
 
 let pass = 0, fail = 0

@@ -89,6 +89,20 @@ _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'am
 _lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
 _lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
 _lm(['caeli','caelo','caelorum','caelis','coelum','coeli','coelo','coelorum','coelis'], 'caelum')
+// Renaissance nc↔nt spelling (concio = contio)
+_lm(['concio','concionis','concioni','concionem','concione','conciones','concionum','concionibus'], 'contio')
+_lm(['concionator','concionatoris','concionatorem','concionatores'], 'contio')
+// Possessive/reflexive pronouns — oblique forms that don't share stems with headword
+_lm(['sibi','se','sese'], 'sui')
+_lm(['suam','suas','suos','suum','suae','sui','suo','suis','sua','suorum','suarum'], 'suus')
+_lm(['tuam','tuas','tuos','tuum','tuae','tui','tuo','tuis','tua','tuorum','tuarum'], 'tuus')
+_lm(['meam','meas','meos','meum','meae','mei','meo','meis','mea','meorum','mearum'], 'meus')
+// littera / litera (Renaissance often drops one t)
+_lm(['literis','literae','literas','litera','literarum','literam'], 'littera')
+// Common adjective forms where wrong verb steals the match
+_lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','novarum'], 'novus')
+// pactum/pacto — not pango
+_lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
 
 // Common endings to try when reconstructing lemmas
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
@@ -225,11 +239,22 @@ export function lookupLS(raw) {
     }
   }
 
+  // 0. Strip enclitics (-que, -ne, -ve) and try the base word
+  let base = word
+  for (const enc of ['que', 'ne', 've']) {
+    if (word.endsWith(enc) && word.length > enc.length + 1) {
+      base = word.slice(0, -enc.length)
+      break
+    }
+  }
+
   // 1. Irregular form → lemma mapping (highest confidence — must beat direct match)
   if (LS_LEMMA[word]) add(LS_LEMMA[word], 15)
+  if (base !== word && LS_LEMMA[base]) add(LS_LEMMA[base], 15)
 
   // 2. Direct match (if the word IS a headword, show it — but LS_LEMMA overrides win)
   add(word, 12)
+  if (base !== word) add(base, 12)
 
   // 3. Find ALL matching DICT entries via stem stripping, then construct L&S lemmas
   //    Key: lookupWord only returns the first stem match, but we need ALL matches
@@ -250,6 +275,7 @@ export function lookupLS(raw) {
     }
   }
   searchStems(word)
+  if (base !== word) searchStems(base)
 
   // Also try j→i, v→u normalization
   const alt = word.replace(/j/g, 'i').replace(/v/g, 'u')
