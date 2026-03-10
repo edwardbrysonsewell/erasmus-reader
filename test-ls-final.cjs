@@ -87,6 +87,31 @@ _lm(['literis','literae','literas','litera','literarum','literam'], 'littera')
 _lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','novarum'], 'novus')
 _lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
 
+// Compound verbs with sum (intersum, adsum, absum, praesum, etc.)
+const SUM_STEMS = ['sum','es','est','sumus','estis','sunt','eram','eras','erat','eramus','eratis','erant',
+  'ero','eris','erit','erimus','eritis','erunt','sim','sis','sit','simus','sitis','sint',
+  'essem','esses','esset','essemus','essetis','essent','esse','fui','fuisti','fuit',
+  'fuimus','fuistis','fuerunt','fuerat','fuerant','fuerit','fuerint','fuisse','fuisset','fuissent',
+  'futurus','futura','futurum','futuri','futuro','futuros','futuras','futuris']
+const SUM_PREFIXES = [
+  ['ab', 'absum'], ['ad', 'adsum'], ['de', 'desum'], ['in', 'insum'],
+  ['inter', 'intersum'], ['ob', 'obsum'], ['prae', 'praesum'],
+  ['sub', 'subsum'], ['super', 'supersum']
+]
+for (const [pfx, lemma] of SUM_PREFIXES) {
+  for (const stem of SUM_STEMS) {
+    const form = pfx + stem
+    if (!LS_LEMMA[form]) LS_LEMMA[form] = lemma
+  }
+}
+const PROSUM_FORMS = ['prosum','prodes','prodest','prosumus','prodestis','prosunt',
+  'proderam','proderat','proderant','prodero','proderit','proderunt',
+  'prosim','prosit','prosint','prodessem','prodesset','prodessent','prodesse',
+  'profui','profuisti','profuit','profuimus','profuistis','profuerunt',
+  'profuerat','profuerant','profuerit','profuisse','profuisset','profuissent',
+  'profuturus','profutura','profuturum']
+_lm(PROSUM_FORMS, 'prosum')
+
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
 const FREQ_ORDER = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, X: 6 }
 
@@ -442,6 +467,14 @@ const tests = [
   ['idque', 'is'], ['haecque', 'hic'], ['animumque', 'animus'],
   // pactum not pango
   ['pacto', 'pactum'],
+  // Compound-sum verbs
+  ['interfuisset', 'intersum'], ['interest', 'intersum'], ['interfuit', 'intersum'],
+  ['abest', 'absum'], ['abfuit', 'absum'], ['abesse', 'absum'],
+  ['adest', 'adsum'], ['adfuit', 'adsum'], ['adesse', 'adsum'],
+  ['deest', 'desum'], ['deesse', 'desum'],
+  ['praefuit', 'praesum'], ['praeest', 'praesum'],
+  ['profuit', 'prosum'], ['prodest', 'prosum'], ['prodesse', 'prosum'],
+  ['superest', 'supersum'], ['superfuit', 'supersum'],
 ]
 
 let pass = 0, fail = 0

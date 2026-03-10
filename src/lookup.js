@@ -104,6 +104,33 @@ _lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','no
 // pactum/pacto — not pango
 _lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
 
+// Compound verbs with sum (intersum, adsum, absum, praesum, etc.)
+// Generate all prefix+stem combinations automatically
+const SUM_STEMS = ['sum','es','est','sumus','estis','sunt','eram','eras','erat','eramus','eratis','erant',
+  'ero','eris','erit','erimus','eritis','erunt','sim','sis','sit','simus','sitis','sint',
+  'essem','esses','esset','essemus','essetis','essent','esse','fui','fuisti','fuit',
+  'fuimus','fuistis','fuerunt','fuerat','fuerant','fuerit','fuerint','fuisse','fuisset','fuissent',
+  'futurus','futura','futurum','futuri','futuro','futuros','futuras','futuris']
+const SUM_PREFIXES = [
+  ['ab', 'absum'], ['ad', 'adsum'], ['de', 'desum'], ['in', 'insum'],
+  ['inter', 'intersum'], ['ob', 'obsum'], ['prae', 'praesum'],
+  ['sub', 'subsum'], ['super', 'supersum']
+]
+for (const [pfx, lemma] of SUM_PREFIXES) {
+  for (const stem of SUM_STEMS) {
+    const form = pfx + stem
+    if (!LS_LEMMA[form]) LS_LEMMA[form] = lemma
+  }
+}
+// prosum is irregular: prod- before vowels (prodest, profui, etc.)
+const PROSUM_FORMS = ['prosum','prodes','prodest','prosumus','prodestis','prosunt',
+  'proderam','proderat','proderant','prodero','proderit','proderunt',
+  'prosim','prosit','prosint','prodessem','prodesset','prodessent','prodesse',
+  'profui','profuisti','profuit','profuimus','profuistis','profuerunt',
+  'profuerat','profuerant','profuerit','profuisse','profuisset','profuissent',
+  'profuturus','profutura','profuturum']
+_lm(PROSUM_FORMS, 'prosum')
+
 // Common endings to try when reconstructing lemmas
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
 

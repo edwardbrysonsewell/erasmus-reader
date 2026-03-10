@@ -61,6 +61,40 @@ _lm(['animo','animum','animi','animorum','animis','animos'], 'animus')
 _lm(['amans','amantis','amantem','amante','amantes','amantium','amantibus'], 'amo')
 _lm(['virum','viri','viro','virorum','viris','viros'], 'vir')
 _lm(['malum','mala','mali','malo','malorum','malis','malos','malam','malas'], 'malus')
+_lm(['caeli','caelo','caelorum','caelis','coelum','coeli','coelo','coelorum','coelis'], 'caelum')
+_lm(['concio','concionis','concioni','concionem','concione','conciones','concionum','concionibus'], 'contio')
+_lm(['concionator','concionatoris','concionatorem','concionatores'], 'contio')
+_lm(['sibi','se','sese'], 'sui')
+_lm(['suam','suas','suos','suum','suae','sui','suo','suis','sua','suorum','suarum'], 'suus')
+_lm(['tuam','tuas','tuos','tuum','tuae','tui','tuo','tuis','tua','tuorum','tuarum'], 'tuus')
+_lm(['meam','meas','meos','meum','meae','mei','meo','meis','mea','meorum','mearum'], 'meus')
+_lm(['literis','literae','literas','litera','literarum','literam'], 'littera')
+_lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','novarum'], 'novus')
+_lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
+// Compound verbs with sum
+const SUM_STEMS = ['sum','es','est','sumus','estis','sunt','eram','eras','erat','eramus','eratis','erant',
+  'ero','eris','erit','erimus','eritis','erunt','sim','sis','sit','simus','sitis','sint',
+  'essem','esses','esset','essemus','essetis','essent','esse','fui','fuisti','fuit',
+  'fuimus','fuistis','fuerunt','fuerat','fuerant','fuerit','fuerint','fuisse','fuisset','fuissent',
+  'futurus','futura','futurum','futuri','futuro','futuros','futuras','futuris']
+const SUM_PREFIXES = [
+  ['ab', 'absum'], ['ad', 'adsum'], ['de', 'desum'], ['in', 'insum'],
+  ['inter', 'intersum'], ['ob', 'obsum'], ['prae', 'praesum'],
+  ['sub', 'subsum'], ['super', 'supersum']
+]
+for (const [pfx, lemma] of SUM_PREFIXES) {
+  for (const stem of SUM_STEMS) {
+    const form = pfx + stem
+    if (!LS_LEMMA[form]) LS_LEMMA[form] = lemma
+  }
+}
+const PROSUM_FORMS = ['prosum','prodes','prodest','prosumus','prodestis','prosunt',
+  'proderam','proderat','proderant','prodero','proderit','proderunt',
+  'prosim','prosit','prosint','prodessem','prodesset','prodessent','prodesse',
+  'profui','profuisti','profuit','profuimus','profuistis','profuerunt',
+  'profuerat','profuerant','profuerit','profuisse','profuisset','profuissent',
+  'profuturus','profutura','profuturum']
+_lm(PROSUM_FORMS, 'prosum')
 
 const LEMMA_ENDINGS = ['', 'o', 'us', 'um', 'a', 'is', 'er', 'or', 'io', 'e', 'es', 'as', 'eo', 'men', 'ns', 'x']
 const FREQ_ORDER = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5, X: 6 }
