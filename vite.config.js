@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/erasmus-reader/',
+  base: '/',
   build: {
     chunkSizeWarningLimit: 30000,
     rollupOptions: {
@@ -28,8 +28,8 @@ export default defineConfig({
         background_color: '#f5f0e8',
         display: 'standalone',
         orientation: 'any',
-        start_url: '/erasmus-reader/',
-        scope: '/erasmus-reader/',
+        start_url: '/',
+        scope: '/',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
