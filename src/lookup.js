@@ -103,6 +103,17 @@ _lm(['literis','literae','literas','litera','literarum','literam'], 'littera')
 _lm(['nova','novum','novae','novo','novis','novam','novos','novas','novorum','novarum'], 'novus')
 // pactum/pacto — not pango
 _lm(['pacto','pactum','pacti','pactorum','pactis'], 'pactum')
+// 4th declension nouns whose short stems cause noise
+_lm(['manum','manu','manui','manuum','manibus'], 'manus')
+_lm(['domum','domo','domui','domuum','domibus','domi','domos'], 'domus')
+_lm(['senatum','senatu','senatui','senatus','senatuum'], 'senatus')
+_lm(['spiritum','spiritu','spiritui','spirituum','spiritibus'], 'spiritus')
+_lm(['exercitum','exercitu','exercitui','exercituum','exercitibus'], 'exercitus')
+// Common nouns whose stems overlap with verbs
+_lm(['vitam','vitae','vitas','vitarum','vitis'], 'vita')
+_lm(['frequentiam','frequentiae','frequentias','frequentiarum','frequentiis'], 'frequentia')
+_lm(['causam','causae','causas','causarum','causis'], 'causa')
+_lm(['litteram','litterae','litteras','litterarum','litteris'], 'littera')
 
 // Compound verbs with sum (intersum, adsum, absum, praesum, etc.)
 // Generate all prefix+stem combinations automatically
@@ -202,20 +213,49 @@ function broadLemmas(entry) {
 const N1_ENDS = new Set(['a','ae','am','arum','is'])
 const N2_ENDS = new Set(['us','um','i','o','e','orum','os','is'])
 const N3_ENDS = new Set(['em','is','i','e','es','ibus','um','ium','a'])
-const N4_ENDS = new Set(['us','u','ui','uum','ibus'])
+const N4_ENDS = new Set(['us','um','u','ui','uum','ibus'])
 const N5_ENDS = new Set(['es','ei','erum','ebus'])
 const V_ENDS = new Set(['o','as','at','amus','atis','ant','es','et','emus','etis','ent',
   'is','it','imus','itis','unt','ebam','ebas','ebat','ebamus','ebatis','ebant',
   'abam','abas','abat','abamus','abatis','abant','iebam','iebas','iebat',
   'abo','abis','abit','abimus','abitis','abunt','ebo','ebis','ebit',
   'am','iam','ias','iat','iamus','iatis','iant',
-  'arem','ares','aret','erem','eres','eret','irem','ires','iret',
+  'arem','ares','aret','aremus','aretis','arent',
+  'erem','eres','eret','eremus','eretis','erent',
+  'irem','ires','iret','iremus','iretis','irent',
   'a','ate','are','e','ete','ere','i','ite','ire',
   'eo','io','avit','evit','ivit','uit',
   'atur','etur','itur','antur','entur','untur',
   'or','aris','eris','iris',
+  // Present participle (all cases)
   'ans','ens','iens',
-  're','ri','isse','ando','endo','iendo'])
+  'antis','anti','antem','ante','antes','antium','antibus',
+  'entis','enti','entem','ente','entes','entium','entibus',
+  'ientis','ienti','ientem','iente','ientes','ientium','ientibus',
+  // Gerund & gerundive
+  'ando','endo','iendo',
+  'andi','endi','iendi',
+  'andum','endum','iendum',
+  'andus','anda','andi','ando',
+  'endus','enda','endi','endo',
+  'iendus','ienda','iendi','iendo',
+  'andam','andarum','andis','andos','andas','ando','andorum',
+  'endam','endarum','endis','endos','endas','endorum',
+  // Future active participle
+  'urus','ura','urum','uri','uro','uram','uras','uros','urorum','urarum','uris',
+  // Perfect active (1st conj full, plus common others)
+  'avi','avisti','avimus','avistis','averunt','avere',
+  'averam','averas','averat','averamus','averatis','averant',
+  'avero','averis','averit','averimus','averitis','averint',
+  'averim','averis','avissem','avisses','avisset','avissemus','avissent','avisse',
+  'evi','evisti','evimus','evistis','everunt',
+  'everam','everat','everant','everim','evisse','evisset',
+  'ivi','ivisti','ivimus','ivistis','iverunt',
+  'iveram','iverat','iverant','iverim','ivisse','ivisset',
+  // Infinitives
+  're','ri','isse',
+  'ari','eri','iri',
+  'avisse','evisse','ivisse'])
 const ADJ12_ENDS = new Set(['us','a','um','i','ae','o','orum','arum','os','as','is','ibus','em','e'])
 const ADJ3_ENDS = new Set(['is','e','i','es','ium','ibus','em','ia','ior','ius'])
 
@@ -275,29 +315,35 @@ export function lookupLS(raw) {
     }
   }
 
-  // 1. Irregular form → lemma mapping (highest confidence — must beat direct match)
-  if (LS_LEMMA[word]) add(LS_LEMMA[word], 15)
-  if (base !== word && LS_LEMMA[base]) add(LS_LEMMA[base], 15)
+  // 1. Irregular form → lemma mapping (highest confidence)
+  if (LS_LEMMA[word]) add(LS_LEMMA[word], 20)
+  if (base !== word && LS_LEMMA[base]) add(LS_LEMMA[base], 20)
 
-  // 2. Direct match (if the word IS a headword, show it — but LS_LEMMA overrides win)
-  add(word, 12)
-  if (base !== word) add(base, 12)
+  // 2. Direct match — exact headword gets score 20 (or 18 if LS_LEMMA exists for a different headword)
+  const hasLemma = !!(LS_LEMMA[word] || (base !== word && LS_LEMMA[base]))
+  const directScore = hasLemma ? 18 : 20
+  add(word, directScore)
+  if (base !== word) add(base, directScore)
 
   // 3. Find ALL matching DICT entries via stem stripping, then construct L&S lemmas
   //    Key: lookupWord only returns the first stem match, but we need ALL matches
   //    to find the best L&S entry across all possible interpretations.
   function searchStems(w) {
-    for (let cut = 0; cut <= Math.min(7, w.length - 2); cut++) {
+    for (let cut = 0; cut <= Math.min(9, w.length - 2); cut++) {
       const stem = cut === 0 ? w : w.slice(0, -cut)
       if (stem.length < 2) break
       if (!stemIdx.has(stem)) continue
       const ending = cut === 0 ? '' : w.slice(-cut)
+      // Longer stem match = more precise = higher confidence
+      const stemBonus = Math.max(0, stem.length - 2)
       for (const entry of stemIdx.get(stem)) {
         const freqScore = 6 - (FREQ_ORDER[entry.frequency] ?? 6)
         const mb = morphBonus(ending, entry)
+        // For aggressive cuts (4+), require morphological match to filter noise
+        if (cut >= 4 && mb === 0) continue
         const best = bestLemma(entry)
-        if (best) add(best, freqScore + 1 + mb) // +1 for precision, +mb for morph match
-        for (const lemma of broadLemmas(entry)) add(lemma, freqScore + mb)
+        if (best) add(best, freqScore + 1 + mb + stemBonus)
+        for (const lemma of broadLemmas(entry)) add(lemma, freqScore + mb + stemBonus)
       }
     }
   }
@@ -339,7 +385,7 @@ export function lookupLS(raw) {
 
   // 4. Also try raw DICT stems + LEMMA_ENDINGS as broad net
   const triedStems = new Set()
-  for (let cut = 0; cut <= Math.min(7, word.length - 2); cut++) {
+  for (let cut = 0; cut <= Math.min(9, word.length - 2); cut++) {
     const stem = cut === 0 ? word : word.slice(0, -cut)
     if (stem.length < 2) break
     if (!stemIdx.has(stem)) continue
@@ -358,7 +404,7 @@ export function lookupLS(raw) {
 
   // 5. Blind stem stripping as absolute last resort
   if (found.size === 0) {
-    for (let cut = 1; cut <= Math.min(7, word.length - 2); cut++) {
+    for (let cut = 1; cut <= Math.min(9, word.length - 2); cut++) {
       const stem = word.slice(0, -cut)
       add(stem, 0)
       for (const end of LEMMA_ENDINGS) {
@@ -373,20 +419,44 @@ export function lookupLS(raw) {
   // Sort candidates by score (higher = more likely the right entry)
   const sorted = [...found.entries()].sort((a, b) => b[1].freq - a[1].freq)
 
-  // Flatten, deduplicate
+  // Filter out low-scoring noise (must be within 4 points of top score)
+  const topScore = sorted[0]?.[1].freq || 0
+  const minScore = topScore - 3
+
+  // Flatten, deduplicate; sort sub-entries by senses length (longer = more common)
   const result = []
   const seen = new Set()
-  for (const [, data] of sorted) {
-    for (const e of data.entries) {
-      const key = (e.o || '') + '||' + (e.s || '').slice(0, 100)
-      if (!seen.has(key)) {
-        seen.add(key)
+  const includedKeys = new Set()
+  for (const [key, data] of sorted) {
+    if (data.freq < minScore) continue
+    includedKeys.add(key)
+    const byLength = [...data.entries].sort((a, b) => (b.s || '').length - (a.s || '').length)
+    for (const e of byLength) {
+      const dedup = (e.o || '') + '||' + (e.s || '').slice(0, 100)
+      if (!seen.has(dedup)) {
+        seen.add(dedup)
         result.push(e)
       }
     }
   }
 
-  return result.length > 0 ? result : null
+  if (result.length === 0) return null
+
+  // Collect related headwords (scored lower but still plausible) for "see also" links
+  const related = []
+  const relatedMin = topScore - 12
+  for (const [key, data] of sorted) {
+    if (includedKeys.has(key)) continue
+    if (data.freq < relatedMin) continue
+    const orth = data.entries[0]?.o
+    if (orth && !related.some(r => r.key === key)) {
+      related.push({ key, orth, score: data.freq })
+    }
+    if (related.length >= 8) break
+  }
+  result.related = related
+
+  return result
 }
 
 // ── Build stem index: stem → entries ────────────────────────
