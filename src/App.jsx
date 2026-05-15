@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import colloquia from './data/colloquia.json'
 import eutropius from './data/eutropius.json'
 import caesar from './data/caesar.json'
+import pliny from './data/pliny.json'
 import sallust from './data/sallust.json'
 import suetonius from './data/suetonius.json'
 import nepos from './data/nepos.json'
@@ -51,6 +52,15 @@ const WORKS = [
     author: 'C. Suetonius Tranquillus',
     entries: suetonius,
     entryLabel: 'vitae',
+    credit: 'Text: The Latin Library',
+    hasSpeakers: false,
+  },
+  {
+    key: 'pliny',
+    title: 'Epistulae',
+    author: 'C. Plinius Caecilius Secundus',
+    entries: pliny,
+    entryLabel: 'libri',
     credit: 'Text: The Latin Library',
     hasSpeakers: false,
   },
